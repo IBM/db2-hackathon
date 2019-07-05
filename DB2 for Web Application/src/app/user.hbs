@@ -1,0 +1,516 @@
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{{userID}}</title>
+    <link rel="stylesheet" type="text/css" href="build/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="build/bootstrap/css/bootstrap-grid.min.css">
+    <link rel="stylesheet" type="text/css" href="build/bootstrap/css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" type="text/css" href="build/iconFonts/iconFonts.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="build/jquery.min.js"></script>
+    <script src="build/service/service.js"></script>
+    <style>
+        body{position: relative;overflow: hidden;}
+        .main {
+            height: calc(100% - 76px);
+            width: 100%;
+            overflow: hidden;
+        }
+        .queryBarContainer{width:60%;}
+        .queryLabel{
+            width:30%;
+        }
+        .queryBar0, .queryBar1, .queryBar2{
+            height:16px;
+            background-color: #6eedd8;
+            vertical-align: bottom;
+            text-align: center;
+            overflow: visible;
+            color: #4178be;
+            line-height: 16px;
+            font-size: 14px;
+            -webkit-transition: width .5s;
+            -moz-transition: width .5s;
+            -ms-transition: width .5s;
+            -o-transition: width .5s;
+            transition: width .5s;
+        }
+        .queryNum{margin: 0 10px;}
+        .queryBar1{
+            background-color: #41d6c3;
+        }
+        .queryBar2{
+            background-color: #a6266e;
+        }
+        .queryContainer span {
+            display: inline-block;
+        }
+        .queryContainer {
+            font-size: 16px;
+            line-height: 16px;
+        }
+        .blur{
+            -webkit-filter: blur(5px); /* Chrome, Opera */
+            -moz-filter: blur(5px);
+            -ms-filter: blur(5px);
+            filter: blur(5px);
+        }
+        .left-control, .main-screen{
+            display: block;
+            float: left;
+            height: 100%;
+            -webkit-transition: width .5s;
+            -moz-transition: width .5s;
+            -ms-transition: width .5s;
+            -o-transition: width .5s;
+            transition: width .5s;
+            margin:0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .left-control{overflow: auto;}
+        .main-screen{
+            overflow: auto;
+            padding: 10px;
+            color: black;
+        }
+        .credential, .client-control{
+            border-bottom: 1.5px solid #5FC5BA;
+            padding:10px 20px;
+            display: block;
+        }
+        .credential.collapse,.client-control.collapse{
+            height: 50px;
+            overflow: hidden;
+            background-color:#1D3649;
+        }
+        .credential h4, .client-control h4{
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .displayIcon{
+            float: right;
+            margin-right: 10px;
+        }
+        .credential.collapse .displayIcon:before,.client-control.collapse .displayIcon:before{
+            content:'\e90b';
+        }
+        #demo div{
+            margin: 5px;
+        }
+        button{
+            margin:10px;
+        }
+        #demo div button{
+            margin: 0;
+        }
+        .form-group span{
+            font-size: 14px;
+            display: block;
+            margin-bottom:2px;
+            margin-left: 10px;
+        }
+        .form-group span:after {
+            content: '*';
+            color: red;
+            margin-left: 2px;
+        }
+        .poolDash{
+            width:50%;
+            display: inline-block;
+        }
+        .size.blank, .size.block{
+            display: inline-block;
+            height:20px;
+            width:20px;
+            border: 1px solid #152935;
+            margin-right: 1px;
+            background-color: white;
+        }
+        .size.block{
+            background-color: #152935;
+        }
+        .btn.mockUser:before{
+            font-family: 'iconFonts' !important;
+            font-size: 18px;
+            content: '\e986';
+            margin-right: 3px;
+        }
+        #progressBar{
+            display: none;
+            width: 100%;
+            height: 20px;
+            position: fixed;
+            top:0;
+            left:0;
+            margin: 0;
+            z-index: 100;
+        }
+        #progressBar div{
+            width: 100%;
+            height: 10px;
+            position: absolute;
+            top:0;
+            left: 0;
+        }
+        #progressBar div span{
+            position: absolute;
+            display: inline-block;
+            background: #007bff;
+            height: 10px;
+            width: 100%;
+            animation:bgLoad 3s infinite;
+            -webkit-animation:bgLoadw 3s infinite;
+        }
+        @keyframes bgLoad{
+            0%{
+                width: 0%;
+            }
+            100%{
+                width:100%;
+            }
+        }
+        @-webkit-keyframes bgLoadw{
+            0%{
+                width: 0%;
+            }
+            100%{
+                width:100%;
+            }
+        }
+        .pos-f-t{
+            z-index: 10;
+            position: relative;
+        }
+        .topWarn{
+            z-index: 5;
+            height:80px;
+            position: absolute;
+            width:100%;
+            -webkit-transition: top .5s;
+            -moz-transition: top .5s;
+            -ms-transition: top .5s;
+            -o-transition: top .5s;
+            transition: top .5s;
+        }
+        #okBtn{
+            margin-left: 100px;
+        }
+        .bg-dark{
+            background-color: #152935!important;
+        }
+        .bg-secondary{
+            background-color: white!important;
+        }
+    </style>
+</head>
+<body>
+    <div id="progressBar"><div><span></span></div></div>
+    <div class="pos-f-t">
+        <nav class="navbar navbar-dark bg-dark">
+            <button onclick="toggle()" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <button type="button" class="btn btn-info" onclick="javascript:location.href='/'">Sign out</button>
+        </nav>
+    </div>
+    <div id="popupDialog" style="top:-10px" class="alert alert-warning topWarn">
+        <strong>Warning!</strong>
+        <span>Best check yo self, you're not looking too good.</span>
+
+        <button type="button" id="okBtn" class="btn btn-info" data-dismiss="alert">OK</button>
+        <button type="button" id="cancelBtn" class="btn btn-dark" data-dismiss="alert">Cancel</button>
+    </div>
+    <div class="main">
+        <span style="width: 28%; background-color:#1D3649!important;color: white;" class="left-control bg-light">
+            <div class="credential">
+                <h4 onclick="javascript:toggleCollapse(this)">Db2 Credential<span class="displayIcon iconF-arrow_up"></span></h4>
+                   <div class="row form-group">
+                       <div class="col-7">
+                       <span>IP Address/Domain</span>
+                       <input onclick="checkValid(this,true)" onblur="checkValid(this)" id="hostname" value="{{hostname}}" name="hostname" type="text" class="form-control" placeholder="Host name">
+                       </div>
+                        <div class="col-5">
+                        <span>Port</span>
+                        <input onclick="checkValid(this,true)" onblur="checkValid(this)" id="port" value="{{port}}" name="port" type="number" class="form-control" placeholder="Port">
+                        </div>
+                   </div>
+                  <div class="form-group">
+                        <span>Database name</span>
+                        <input onclick="checkValid(this,true)" onblur="checkValid(this)" type="text" style="text-transform:uppercase;" class="form-control" value="{{db}}" id="dbname" name="dbname" aria-describedby="emailHelp" placeholder="DB name ">
+                  </div>
+                    <div class="form-group">
+                        <span>Db2 User</span>
+                        <input onclick="checkValid(this,true)" onblur="checkValid(this)" type="text" class="form-control" value="{{username}}" id="dbuser" name="dbuser" aria-describedby="emailHelp" placeholder="DB2 User ">
+                  </div>
+                  <div class="form-group">
+                      <span>Password</span>
+                        <input onclick="checkValid(this,true)" onblur="checkValid(this)" type="password" id="dbpassword" value="{{password}}" name="dbpassword" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                  </div>
+                    <div>
+                        <button onclick="test()" type="submit" class="btn btn-info" style="width:100%;margin:0;">Test connection</button>
+                    </div>
+                    <div>
+                        <span style="display: inline-block; width: 50%; padding: 16px 10px 8px 0px;"><button onclick="confirmLoad()" class="btn btn-info" style="margin:0px;width:100%;">Load data</button></span><span style="display: inline-block; width: 50%; padding: 16px 0px 10px 8px;"><button onclick="confirmClean()" class="btn btn-danger" style="margin:0px;width:100%;">Clear data</button></span>
+                    </div>
+            </div>
+            <div class="client-control collapse">
+                <h4 onclick="javascript:toggleCollapse(this)">App Control Panel<span class="displayIcon iconF-arrow_up"></span></h4>
+                <div class="form-group">
+                    <span>Limit for Purchasing pool</span>
+                    <input onclick="checkValid(this,true)" onblur="checkValid(this)" class="form-control" id="purSize" type="number" aria-describedby="emailHelp" placeholder="Connection number - default 5">
+                </div>
+                <div class="form-group">
+                    <span>Limit for customer service pool</span>
+                    <input onclick="checkValid(this,true)" onblur="checkValid(this)" class="form-control" id="custSize" type="number" aria-describedby="emailHelp" placeholder="Connection number - default 2">
+                </div>
+                <div class="form-group">
+                    <span>Parrallel user number</span>
+                    <input onclick="checkValid(this,true)" onblur="checkValid(this)" class="form-control" id="clientnumber" type="number" aria-describedby="emailHelp" placeholder="User number">
+                </div>
+                <div>
+                    <span style="display: inline-block; width: 50%; padding: 16px 10px 8px 0px;"><button type="button" onclick="start()" class="btn btn-info" style="margin:0px;width:100%;">START</button></span><span style="display: inline-block; width: 50%; padding: 16px 0px 10px 8px;"><button type="button" onclick="stop()" style="margin:0px;width:100%;" class="btn btn-danger">STOP</button></span>
+                </div>
+            </div>
+        </span>
+        <span style="width: 72%;" id="demo" class="main-screen bg-secondary">
+
+        </span>
+    </div>
+<script>
+    var i = 1;
+    var socket = io();
+    var shops = {};
+    var bgColor = ["alert-success", "alert-info", "alert-warning", "alert-danger"];
+    window.service = new LoadData();
+
+    var startp = new startPool(document.getElementById('demo'));
+
+    document.getElementById('clientnumber').onkeydown = function(e){
+        if(e.which===13){
+            start();
+        }
+    }
+
+    socket.on('connect', function () {
+
+    });
+
+    function checkUnsigned(input){
+        if(parseInt(input.value)&&parseInt(input.value)<0){
+            input.value = 0;
+        }
+    }
+
+    function buildRetailer(num){
+        document.getElementById('demo').innerHTML = "";
+        shops = {};
+        for(var i=1;i<=parseInt(num);i++){
+            var shop = '<div id="shop'+i+'" class="alert '+bgColor[i%4]+'">Building</div>';
+            document.getElementById('demo').innerHTML += shop;
+            shops['shop'+i] = [];
+        }
+    }
+
+    function checkValid(node, sigh){
+//        if(!node.value){
+//            node.parentNode.querySelector('span').innerHTML = "Required field!";
+//        }
+//        else{
+//            node.parentNode.querySelector('span').innerHTML = "";
+//        }
+//        if(sigh)
+//            node.parentNode.querySelector('span').innerHTML = "";
+    }
+
+    function startPoolling(size1, size2){
+        startp.init(size1, size2, "Purchasing Pool", "Customer Service Pool");
+    }
+
+    function handleResult(result){
+        var pane1 = document.getElementById("pool0");
+        var pane2 = document.getElementById("pool1");
+
+        if(result.qrPS !== undefined && result.queryNum !== undefined){
+            //startp.setMetric(parseInt(result.qrPS), parseInt(result.queryNum), result.timestamp);
+            startp.refreshUserMetrics(result);
+        }
+
+        else if(result.data){
+            startp.initUserMetrics(result.data, pane1, pane2);
+        }
+
+//        var states = result.state.split("-");
+//
+//        if(states[1]=="start"){
+//            result.state = states[0];
+//            var connNum = parseInt(result.connNum)||0;
+//            startp.userSignIn(pane1, result);
+//            startp.setDash(connNum, 0);
+//        }
+//        else {
+//            var left = states[1] == "process" ? 3 : 8;
+//            var success = states[1] == "error" ? -1 : (states[1] == "success" ? 1 : 0);
+//            var name = (!result.username||result.username=="undefined")?"":result.username+" ";
+//            var label = name+states[0];
+//            var connNum = parseInt(result.connNum)||0;
+//            if (states.length >= 4) {
+//                startp.transfer(pane1, pane2, result.userid);
+//                startp.moveUser(pane2, result.userid, 0, 0, label);
+//                startp.setDash(undefined, connNum);
+//            }
+//            else if (states.length == 3) {
+//                startp.moveUser(pane2, result.userid, left, success, label);
+//                startp.setDash(undefined, connNum);
+//            }
+//            else if(states.length==2){
+//                startp.moveUser(pane1, result.userid, left, success, label);
+//                startp.setDash(connNum, 0);
+//            }
+//        }
+    }
+
+    function start(){
+        var params = getFormBody();
+        if(!params){
+            //alert("Please enter the db2 credential first!");
+            return ;
+        }
+        var reg = /^[0-9]*[1-9][0-9]*$/;
+        var num = document.getElementById("clientnumber").value;
+        if(!num) {checkValid(document.getElementById("clientnumber"));return ;};
+        if(!reg.test(num)){
+            alert("Please enter a digit number");
+            return ;
+        }
+
+        params.num = num;
+        params.purSize = parseInt(document.getElementById("purSize").value)||5;
+        params.custSize = parseInt(document.getElementById("custSize").value)||2;
+
+        if(!reg.test(params.purSize)){
+            alert("Please enter a digit number");
+            return ;
+        }
+        if(!reg.test(params.custSize)){
+            alert("Please enter a digit number");
+            return ;
+        }
+        socket.emit('start', params);
+        //buildRetailer(num);
+        startPoolling(params.purSize, params.custSize);
+        socket.on('msg', function (result) {
+            handleResult(JSON.parse(result));
+        });
+
+        socket.on('sys', function (stat) {
+            if(stat=='nocred'){
+                alert("Db2 connection failed");
+            }
+            if(stat=='nodata'){
+                alert("No data in certain db, please load data first");
+            }
+        });
+    }
+    function stop(){
+        socket.emit('stop','haha');
+    }
+    function toggle() {
+        var width = document.querySelector('.left-control').style.width;
+        var width1 = '30%'; var width2 = '70%';
+        if(parseInt(width)==30){
+            width1 = '0%';
+            width2 = '100%';
+        }
+        document.querySelector('.left-control').style.width = width1;
+        document.querySelector('.main-screen').style.width = width2;
+    }
+    function getFormBody(){
+        var hostname = document.getElementById("hostname").value.trim();
+        if(!hostname) checkValid(document.getElementById("hostname"));
+        var port = document.getElementById("port").value;
+        if(!port) checkValid(document.getElementById("port"));
+        var db = document.getElementById("dbname").value.toString().toUpperCase();
+        if(!db) checkValid(document.getElementById("dbname"));
+        var username = document.getElementById("dbuser").value.trim();
+        if(!username) checkValid(document.getElementById("dbuser"));
+        var password = document.getElementById("dbpassword").value;
+        if(!password) checkValid(document.getElementById("dbpassword"));
+        var userid = window.location.pathname.split("/")[1];
+        if(hostname && port && db && username && password)
+            return {hostname, port, db, username, password, userid};
+        else {
+            return null;
+        }
+    }
+    function setFormBody(params) {
+        var {hostname, port, db, username, password, userid} = params;
+        document.getElementById("hostname").value = hostname;
+        document.getElementById("port").value = port;
+        document.getElementById("dbname").value = db;
+        document.getElementById("dbuser").value = username;
+        document.getElementById("dbpassword").value = password;
+    }
+    function load(){
+        var params = getFormBody();
+        if(params) {
+            params.cmd = "load";
+            service.load(params);
+        }
+    }
+    function test(){
+        var params = getFormBody();
+        if(params) {
+            params.cmd = "test";
+            service.load(params);
+        }
+        //else alert("Please enter the db2 credential first!");
+    }
+    function clean(){
+        var params = getFormBody();
+        if(params) {
+            params.cmd = "clear";
+            service.load(params);
+        }
+        //else alert("Please enter the db2 credential first!");
+    }
+    function confirmLoad(){
+        var params = {
+            severity:"warn",
+            title:"Notice!",
+            body:"Are you sure to load the data, it may take several minutes?",
+            okHandler:function(){
+                service.showDialog({
+                    severity:"info",
+                    title:"PENDING.",
+                    body:"Data loading may take several minutes, Please wait..."
+                });
+                load();
+            },
+            cancelHandler:service.hideDialog
+        }
+        service.showDialog(params);
+    }
+    function confirmClean(){
+        var params = {
+            severity:"error",
+            title:"Warning!",
+            body:"Are you sure to clean the data?",
+            okHandler:clean,
+            cancelHandler:service.hideDialog
+        }
+        service.showDialog(params);
+    }
+    function toggleCollapse(node){
+        var classes = node.parentNode.className;
+        if(classes.indexOf('collapse')>-1){
+            node.parentNode.className = classes.replace(' collapse','');
+        }
+        else{
+            node.parentNode.className = classes + " collapse";
+        }
+    }
+
+</script>
+</body>
+</html>

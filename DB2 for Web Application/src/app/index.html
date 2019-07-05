@@ -1,0 +1,283 @@
+﻿<html>
+<head lang="en">
+    
+    <title>Project X</title>
+    <link rel="stylesheet" type="text/css" href="build/bootstrap/css/bootstrap.min.css">
+    <script src="build/jquery.min.js"></script>
+    <style>
+        body{
+            width:100%;
+            height:100%;
+            overflow: hidden;
+        }
+        .blur {
+            -webkit-filter: blur(5px); /* Chrome, Opera */
+            -moz-filter: blur(5px);
+            -ms-filter: blur(5px);
+            filter: blur(5px);
+            margin: -15px;
+            width: 110%;
+            height:110%;
+            -webkit-background-size:100% 100%;
+            background-size:100% 100%;
+            background-repeat: no-repeat;
+            background-image: url('build/img/svl.jpg');
+            position: absolute;
+            left:0;top:0;
+        }
+        .input{
+            max-height:420px;
+            width:360px;
+            border-radius: 10px;
+            background-color:rgba(100,100,100,0.4);
+            box-shadow: 0px 5px 10px white;
+            margin:-260px auto;
+            position: relative;
+            height:100%;
+            top:50%;
+            color: white;
+            padding: 40px 20px 40px;
+        }
+        .logo img{
+            width:100%;
+            height:100%;
+        }
+        .login{
+            width:100%;
+            margin-top: 20px;
+            background-color: #325c80;
+            border:none;
+        }
+        .main{
+            position: relative;
+            z-index: 2;
+            left:0;
+            width:100%;
+            height:100%;
+        }
+        .footer{
+            width:100%;
+            height:23%;
+            position: absolute;
+            bottom:0;
+            background-color: #325c80;
+            opacity: 0.9;
+        }
+        .header{
+            position:relative;
+            margin:0 auto;
+            width: 300px;
+            margin-bottom:20px;
+        }
+        .header .switchNew{
+            width: 100%;
+        }
+        .header .switchNew span{
+            width: 50%;
+            display: inline-block;
+            line-height: 36px;
+            height:36px;
+            font-size: 20px;
+            text-align: center;
+            color: white;
+            cursor: pointer;
+        }
+        .header .scroll{
+            position: absolute;
+            left: 0px;
+            width: 50%;
+            height:2px;
+            margin-top: -2px;
+            -webkit-transition: left .2s;
+            -moz-transition: left .2s;
+            -ms-transition: left .2s;
+            -o-transition: left .2s;
+            transition: left .2s;
+        }
+        .header .scroll .line{
+            width: 70%;
+            background: white;
+            margin:0 auto;
+            height:100%;
+        }
+        .inputBody{
+            position: relative;
+        }
+        .form-control{
+            width:230px;
+            margin: 20px auto;
+            display: block;
+        }
+        .qlogin, .web_qr_login{
+            padding-top:10px;
+            width: 100%;
+            position: relative;
+        }
+        .web_qr_login{
+            padding-top:60px;
+        }
+    </style>
+
+
+</head>
+<body>
+    <div class="blur"></div>
+    <div class="main">
+        <div class="input">
+            <div class="header">
+            <!--<div style="display: none" id="switch" class="switch">
+              <a id="switch_qlogin" class="switch_btn_focus" href="javascript:void(0)" >Sign In</a>
+              <a id="switch_login" class="switch_btn" href="javascript:void(0)" >Sign Up</a>
+              <div id="switch_bottom" class="switch_bottom" style="position: absolute; width: 80px; left: 0px;"></div>
+            </div>-->
+
+              <div class="switchNew"><span onclick="switchToSignIn()">Sign In</span><span onclick="switchToSignUp()">Sign Up</span></div>
+              <div class="scroll"><div class="line"></div></div>
+          </div>
+            <div class="inputBody">
+                <div id="web_qr_login" class="web_qr_login" style="display: block;">
+                    <div class="form-group" >
+                        <input type="text" class="form-control" name="username" id="username" aria-describedby="emailHelp" placeholder="User name." />
+                        <input type="password" class="form-control" name="password" id="password"  placeholder="Password." />
+                        <button class="btn login btn-primary form-control" id="btn" type="button">
+                            Sign in
+                        </button>
+                    </div>
+                </div>
+                <div id="qlogin" class="qlogin" style="display: none">
+
+                    <div class="form-group" >
+                        <input type="text" class="form-control" id="signupusername" aria-describedby="emailHelp" placeholder="User name.">
+                        <input type="password" class="form-control" id="signuppassword" placeholder="Password.">
+                        <input type="password" class="form-control" id="confirmpassword" placeholder="Confirm password.">
+                        <button onclick="signUp()" class="btn login btn-primary form-control" type="button">
+                            Sign up
+                        </button>
+                    </div>
+                </div>
+            </div>
+      </div>
+    </div>
+
+
+
+    <div class="footer"></div>
+
+
+</body>
+<script>
+    var stable = 4160 / 3120;
+    var blurContainer = document.querySelector('div.blur');
+    var resize = function(){
+        var curWindow = window.innerWidth/window.innerHeight;
+        var width,height;
+        var marginLeft = -15, marginTop = -15;
+        if(curWindow>stable){
+            width = window.innerWidth + 30;
+            height = parseInt(width/stable) + 1;
+            marginTop = (window.innerHeight - height)/2;
+        }else{
+            height = window.innerHeight + 30;
+            width = parseInt(height*stable) + 1;
+            marginLeft = (window.innerWidth - width)/2;
+        }
+        blurContainer.style.width = width + 'px';
+        blurContainer.style.height = height + 'px';
+        blurContainer.style.marginTop = marginTop + 'px';
+        blurContainer.style.marginLeft = marginLeft + 'px';
+    }
+    var load = function(){
+        resize();
+    }
+    var init = function(){
+        window.onresize = resize;
+        window.onload = load;
+        var check = function(e){
+            if(e.which===13){
+                login();
+            }
+        }
+        $('#username').keydown(check);
+        $('#password').keydown(check);
+        $('#btn').click(login);
+    }
+    init();
+
+    function switchToSignUp(){
+        $('.header .scroll')[0].style.left='50%';
+        $('#web_qr_login').css('display','none');
+        $('#qlogin').css('display','block');
+    }
+
+    function switchToSignIn(){
+        $('.header .scroll')[0].style.left='0%';
+        $('#web_qr_login').css('display','block');
+        $('#qlogin').css('display','none');
+    }
+   function login() {
+       var params = {};
+       params = {
+           username: $("#username").val(),
+           password: $("#password").val()
+       };
+       if(params.username&&params.password) {
+           $.ajax({
+               data: params,
+               url: '/login',
+               type: 'get',
+               dataType: 'json',
+               success: function (data) {
+
+                   console.log(data);
+                   if (data.result == "success" && data.user) {
+                       window.location.href = '/' + data.user;
+                   }
+                   else {
+                       alert('login failed')
+                   }
+
+               },
+
+               error: function (jqXHR, textStatus, errorThrown) {
+                   alert('login failed');
+               }
+           });
+       }
+   }
+   function signUp() {
+       var params = {};
+       params = {
+           username: $("#signupusername").val(),
+           password: $("#signuppassword").val(),
+           vpwd:$('#confirmpassword').val()
+       };
+       if(params.username&&params.password&&params.password==params.vpwd){
+           var p = {
+               username: params.username,
+               password: params.password
+           }
+           $.ajax({
+               data: p,
+               url: '/signup',
+               type: 'get',
+               dataType: 'json',
+               success: function (data) {
+                   console.log(data);
+                   if (data.result == "success" && data.user) {
+                       window.location.href = '/' + data.user;
+                   }
+                   else {
+                       alert('sign up failed: '+data.result);
+                   }
+
+               },
+
+               error: function (jqXHR, textStatus, errorThrown) {
+                   alert('sign up failed');
+               }
+           });
+       }
+   }
+</script>
+
+</html>
