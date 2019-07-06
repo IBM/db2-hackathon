@@ -2,16 +2,13 @@ Overview of DB2 NodeJS Mock Webstore Sample
 
 IBM® DB2 NodeJS Mock Webstore simulates dozens or hunderds of user making online orders separately at the same time, and includes supporting quantities of queries through two connection pools connecting with Db2.
 
-This demo is a simple implementation of an application based on Node.js runtime environment, demonstrating how Node.js applications connect to Db2. It includes examples of running both regular SQL statements as well as JSON capabilities.
+This demo is a simple implementation of an application based on Node.js runtime environment, demonstrating how Node.js applications connect to Db2. It includes examples of running both regular SQL statements as well as JSON capabilities. 
 
 Prerequisite
 Requires NodeJS version later than 6.2.0
 Please download node.js and install it on your local machine. Use the latest LTS build from the https://nodejs.org/en/download/ website.
 
 Requires Db2 version 11.1.2.2
-
-DISCLAIMER:
-Web app creates multiple connections to the database to demonstrate pooling therefore Db2 On Cloud LITE version will not work since it will limit the number of connections.
 
 
 Installing up the app
@@ -98,11 +95,14 @@ For front-end effect smoothness, we recommend the ratio of parallel user number 
 All the source code are under folder
 
     `src/app/build - contains front end dependencied js code.`
-
+    
     `src/app/utils - contains back end code.`
-
+    
     `src/app/index.html - login page`
-
+    
     `src/app/index.js - startup js file`
-
+    
     `src/app/user.hbs - user control page.`
+
+
+

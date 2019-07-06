@@ -13,6 +13,8 @@ var server = require('http').Server(app);
 app.use(express.static(__dirname));
 app.set('views', __dirname);
 app.set('view engine', 'hbs');
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'hbs');
 
 var args = process.argv.splice(2)
 
@@ -22,7 +24,7 @@ if(args.length>=1){
         product = false;
 }
 
-
+// 创建socket服务
 var socketIO = IO(server);
 var socketList = {};
 var userNum = {};
@@ -33,6 +35,8 @@ var userAuth = {};
 var usrPwd = usersCredList.readUser();
 
 socketIO.on('connection', function (socket) {
+    // 获取请求建立socket连接的url
+    // 如: http://localhost:3000/room/room_1, roomID为room_1
     var url = socket.request.headers.referer;
     console.log(socket.request.headers.referer);
     var splited = url.split('/');
@@ -67,6 +71,7 @@ socketIO.on('connection', function (socket) {
                     delete socketList[newUserID];
                 }
                 if(!socketList[newUserID]){
+                    //socketList[newUserID] = new product(num, socketIO, newUserID, 'msg');
                     console.log("refresh");
                     socketList[newUserID] = new ConnectionPool();
                 }
@@ -119,7 +124,6 @@ router.get('/:userID/:path', function(req, res){
             let db_oper = {};
             querys.forEach((stat) => {
                 let prop = stat.split('=');
-                prop[1] = decodeURIComponent(prop[1]);
                 db_oper[prop[0]] = prop[1];
             });
             let pop = new dbDriver();
@@ -276,7 +280,7 @@ router.get('/:userID', function (req, res) {
         }
         else{
             res.location('index.html');
-            res.sendStatus(302);
+            res.send(302);
         }
     }
 });
@@ -285,4 +289,5 @@ console.log(__dirname);
 app.use('/', router);
 server.listen(8888, function () {
     console.log('server listening on port 8888');
+  //  console.log("information: "+str.toString());
 });

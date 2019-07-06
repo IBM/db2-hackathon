@@ -13,19 +13,19 @@ let sc = salutations.length;
 let DataLoad = function() {
 
     this.initPool = (cred, poolSize, prod) => {
-        //ibmdb.debug(true);
-        let connStr = "DATABASE=" + cred.db + ";UID=" + cred.username + ";PWD=" + cred.password + ";HOSTNAME=" + cred.hostname + ";port=" + cred.port +";PROTOCOL=TCPIP";
-        console.log(connStr);
+        if(!prod) ibmdb.debug(true);
+        let connStr = "DATABASE=" + cred.db + ";UID=" + cred.username + ";PWD=" + cred.password + ";HOSTNAME=" + cred.hostname + ";port=" + cred.port;
         if(this.pool){
             this.pool.cleanUp();
             this.pool.close();
         }
         this.pool = new Pool()
         this.pool.setMaxPoolSize(poolSize||1);
-        this.pool.setConnectTimeout(500);
+        this.pool.setConnectTimeout(300);
         this.pool.init(0, connStr);
         this.cred = cred;
         this.connStr = connStr;
+        console.log("Initialize successfully!");
         this.connNum = 0;
         this.queryNum = 0;
     }
@@ -128,9 +128,6 @@ let DataLoad = function() {
         let result;
         //this.connNum++;
         pool.open(connStr, (err, conn) => {
-            if(err){
-              console.log(err);
-            }
             result = this.runSQL(conn, sql);
             if(callBack) callBack(result);
             conn.close();
