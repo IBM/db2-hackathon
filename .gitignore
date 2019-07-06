@@ -105,7 +105,4 @@ venv.bak/
 
 
 
-# web app
-DB2_for_Web_Application/node_modules/
-DB2_for_Web_Application/.DS_Store
-DB2_for_Web_Application/.env
+
